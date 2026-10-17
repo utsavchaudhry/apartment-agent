@@ -4,12 +4,23 @@ Scans Kleinanzeigen, WG-Gesucht and ImmoScout24 around the clock, scores every n
 
 ## Run it
 
-Needs Docker. On Ubuntu/Debian (on macOS/Windows install Docker Desktop instead):
+Needs Docker and git. Install them once:
 
 ```bash
+# Windows (PowerShell), then start Docker Desktop
+winget install -e --id Docker.DockerDesktop
+winget install -e --id Git.Git
+
+# macOS (Homebrew), then start Docker Desktop
+brew install --cask docker
+brew install git
+
+# Ubuntu / Debian / Raspberry Pi OS
 sudo apt install -y docker.io docker-compose-v2 git
 sudo usermod -aG docker $USER && newgrp docker
 ```
+
+On Windows and macOS, turn on **Docker Desktop → Settings → General → Start Docker Desktop when you sign in**, so the agent comes back after a restart. It only scans while the computer is awake, so an always-on machine (a Raspberry Pi, a home server) catches flats fastest.
 
 Start the agent (it keeps running in the background and comes back after a reboot):
 
