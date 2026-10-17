@@ -1,0 +1,344 @@
+{
+  "max_rent_warm": 1300,
+  "prefer_under": 1000,
+  "min_plausible_rent": 250,
+  "min_sqm": 18,
+  "nebenkosten_per_sqm": 4.0,
+  "nebenkosten_base": 100.0,
+  "estimate_warm_for": [
+    "ImmoScout24"
+  ],
+  "move_in_earliest": "",
+  "move_in_latest": "",
+  "max_commute_min": 45,
+  "stale_after_days": 21,
+  "plz_commute": {
+    "85748": [
+      "Garching bei München (Rad 2 min)",
+      2
+    ],
+    "85747": [
+      "Garching (U6)",
+      16
+    ],
+    "85386": [
+      "Eching (695)",
+      21
+    ],
+    "85764": [
+      "Oberschleißheim (292)",
+      21
+    ],
+    "80939": [
+      "Schwabing-Freimann (Rad 22 min)",
+      22
+    ],
+    "80807": [
+      "Schwabing-Freimann (150+U6, 1x um)",
+      28
+    ],
+    "85716": [
+      "Unterschleißheim (X202)",
+      28
+    ],
+    "85737": [
+      "Ismaning (Rad 28 min)",
+      28
+    ],
+    "80805": [
+      "Schwabing-Freimann (U6)",
+      29
+    ],
+    "80802": [
+      "Schwabing-Freimann (U6)",
+      33
+    ],
+    "80803": [
+      "Schwabing-Freimann (U6)",
+      33
+    ],
+    "80804": [
+      "München (U3+U6, 1x um)",
+      33
+    ],
+    "80801": [
+      "München (U6)",
+      34
+    ],
+    "80331": [
+      "Altstadt-Lehel (U6)",
+      35
+    ],
+    "80937": [
+      "Milbertshofen-Am Hart (141+294, 1x um)",
+      35
+    ],
+    "80539": [
+      "Maxvorstadt (U6)",
+      36
+    ],
+    "80799": [
+      "Maxvorstadt (U6)",
+      36
+    ],
+    "80337": [
+      "München (58+U6, 1x um)",
+      37
+    ],
+    "80798": [
+      "Maxvorstadt (153+U6, 1x um)",
+      38
+    ],
+    "80809": [
+      "Milbertshofen-Am Hart (U3+U6, 1x um)",
+      38
+    ],
+    "80333": [
+      "Maxvorstadt (58+U6, 1x um)",
+      39
+    ],
+    "80538": [
+      "Altstadt-Lehel (100+U6, 1x um)",
+      39
+    ],
+    "80796": [
+      "München (53+U6, 1x um)",
+      40
+    ],
+    "85452": [
+      "Moosinning (513+X202, 1x um)",
+      40
+    ],
+    "81679": [
+      "Bogenhausen (68+U6, 1x um)",
+      41
+    ],
+    "80336": [
+      "München (U4+U6, 1x um)",
+      42
+    ],
+    "80469": [
+      "Ludwigsvorstadt-Isarvorstadt (U2+U6, 1x um)",
+      42
+    ],
+    "80636": [
+      "Neuhausen-Nymphenburg (U1+U6, 1x um)",
+      42
+    ],
+    "80933": [
+      "Feldmoching-Hasenbergl (U2+294, 1x um)",
+      43
+    ],
+    "81671": [
+      "Berg am Laim (U5+U6, 1x um)",
+      43
+    ],
+    "81675": [
+      "Au-Haidhausen (100+U6, 1x um)",
+      43
+    ],
+    "80797": [
+      "München (53+U6, 1x um)",
+      44
+    ],
+    "81667": [
+      "Au-Haidhausen (U5+U6, 1x um)",
+      44
+    ],
+    "85399": [
+      "Hallbergmoos (692+X660+U6, 2x um)",
+      44
+    ],
+    "80339": [
+      "Schwanthalerhöhe (U5+U6, 1x um)",
+      45
+    ],
+    "81925": [
+      "Bogenhausen (188+50+U6, 2x um)",
+      45
+    ],
+    "81929": [
+      "Bogenhausen (154+50+U6, 2x um)",
+      45
+    ]
+  },
+  "station_commute": {
+    "garching-hochbr": 12,
+    "hochbr": 12,
+    "garching-forschungszentrum": 18,
+    "forschungszentrum": 18,
+    "garching": 16,
+    "froettmaning": 22,
+    "fröttmaning": 22,
+    "frottmaning": 22,
+    "kieferngarten": 24,
+    "freimann": 26,
+    "studentenstadt": 27,
+    "alte heide": 29,
+    "nordfriedhof": 31,
+    "dietlindenstr": 32,
+    "muenchner freiheit": 34,
+    "münchner freiheit": 34
+  },
+  "good_stations": [
+    "hochbr",
+    "garching",
+    "froettmaning",
+    "frottmaning",
+    "fröttmaning",
+    "kieferngarten",
+    "freimann",
+    "studentenstadt",
+    "alte heide",
+    "nordfriedhof",
+    "dietlindenstr",
+    "muenchner freiheit",
+    "münchner freiheit",
+    "u6",
+    "u-bahn",
+    "ubahn"
+  ],
+  "single_ride_only": false,
+  "wrong_line": [],
+  "block_terms": [
+    "wg-zimmer",
+    "wg zimmer",
+    "zimmer in einer wg",
+    "mitbewohner",
+    "wohngemeinschaft",
+    "zimmer in wg",
+    "shared flat",
+    "flatshare",
+    "wg-geeignet",
+    "mitbewohnerin",
+    "zwischenmiete",
+    "zwischenvermietung",
+    "befristet",
+    "befristung",
+    "temporaer",
+    "temporär",
+    "auf zeit",
+    "untermiete",
+    "untervermietung",
+    "sublet",
+    "subletting",
+    "zeitmietvertrag",
+    "nur fuer",
+    "nur für kurze",
+    "interim",
+    "studentenwg",
+    "studenten-wg",
+    "wg!",
+    "wg ab",
+    "zimmer in einer",
+    "mitbewohner gesucht",
+    "zimmer frei",
+    "wochenendheimfahrer",
+    "wochenend-heimfahrer",
+    "zweitwohnsitz",
+    "flugpersonal",
+    "monteure",
+    "pendler",
+    "muenchen modell",
+    "münchen modell",
+    "wbs erforderlich",
+    "wohnberechtigungsschein"
+  ],
+  "block_terms_title": [
+    "stellplatz",
+    "garage",
+    "gewerbe",
+    "buero",
+    "büro",
+    "praxis",
+    "lager",
+    "ferienwohnung",
+    "monteurzimmer",
+    "boardinghouse",
+    "apartmenthaus",
+    "gesuch",
+    "suche wohnung",
+    "wohnung gesucht",
+    "suchen wohnung",
+    "tausche",
+    "tauschwohnung",
+    "wohnungstausch",
+    "nur tausch",
+    "wohnungsswap",
+    "swap",
+    "tauschangebot",
+    "biete tausch",
+    "zum tausch",
+    "wiesn",
+    "oktoberfest",
+    "kurzentschlossene",
+    "wochenende",
+    "pro nacht",
+    "tage",
+    "uebernachtung",
+    "übernachtung",
+    "messe"
+  ],
+  "soft_negative": [
+    "ohne kueche",
+    "ohne küche",
+    "dachgeschoss ohne",
+    "souterrain"
+  ],
+  "sources": {
+    "kleinanzeigen": {
+      "enabled": true,
+      "location_slug": "garching-b-muenchen",
+      "location_id": "l6303",
+      "radius_km": 15,
+      "pages": 2
+    },
+    "wggesucht": {
+      "enabled": true,
+      "city_slug": "Muenchen",
+      "city_id": 90,
+      "pages": 2
+    },
+    "immoscout24": {
+      "enabled": true,
+      "regions": [
+        "/de/bayern/muenchen-kreis/garching-bei-muenchen",
+        "/de/bayern/muenchen/freimann",
+        "/de/bayern/muenchen/schwabing",
+        "/de/bayern/muenchen/milbertshofen",
+        "/de/bayern/muenchen-kreis/unterschleissheim"
+      ],
+      "per_region": 50
+    }
+  },
+  "schedule": {
+    "interval_min": 20,
+    "day_start_hour": 6,
+    "day_end_hour": 24,
+    "night_interval_min": 60,
+    "digest_time": "23:55"
+  },
+  "ntfy_topic": "",
+  "ntfy_token": "",
+  "notify_email": "",
+  "max_alerts_per_scan": 5,
+  "applicant": {
+    "name": "",
+    "born": "",
+    "job": "",
+    "employer": "",
+    "since": "",
+    "contract": "",
+    "gross_year": "",
+    "gross_month": "",
+    "smoker": false,
+    "pets": false,
+    "household": 1,
+    "move_in": "",
+    "email": "",
+    "phone": "",
+    "has_schufa": true,
+    "has_anmeldung": true,
+    "has_arbeitgeberbestaetigung": true
+  }
+}

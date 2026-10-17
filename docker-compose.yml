@@ -1,0 +1,13 @@
+services:
+  apartment-agent:
+    build: .
+    container_name: apartment-agent
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data
+    environment:
+      TZ: Europe/Berlin
+      # Set this to require a password for the dashboard (any username works).
+      DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD:-}
