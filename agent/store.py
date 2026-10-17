@@ -36,7 +36,11 @@ EXTRA_COLS = {
     "scam_flags": "TEXT",
     "checked": "INTEGER DEFAULT 0",   # 1 once the ad page itself has been read
     "last_seen": "TEXT",             # last scan that still saw this uid live
-    "status": "TEXT DEFAULT ''",     # '' | contacted | dismissed -- set from the dashboard
+    "status": "TEXT DEFAULT ''",
+    # What the matcher read at scan time, kept so a rescore sees the same facts.
+    # NULL avail marks a row stored before these existed (see rescore.py).
+    "avail": "TEXT",
+    "warm": "REAL",     # '' | contacted | dismissed -- set from the dashboard
 }
 
 

@@ -87,7 +87,8 @@ def main():
                 sqm=r.get("sqm"), rooms=r.get("rooms"), plz=plz, area=area,
                 commute=commute, move_in=str(mdate) if mdate else "",
                 score=score, verdict=verdict, reasons=" ; ".join(reasons),
-                body=(r.get("body") or "")[:1500],
+                body=(r.get("body") or "")[:4000],
+                avail=r.get("avail") or "", warm=r.get("warm"),
                 posted=posted, scam_risk=risk, scam_flags="; ".join(flags),
                 checked=checked,
             )

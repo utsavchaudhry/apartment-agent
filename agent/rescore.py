@@ -17,7 +17,8 @@ def main():
     changed = 0
     for r in rows:
         rec = dict(r)
-        rec["avail"] = ""
+        legacy = r["avail"] is None
+        rec["avail"] = r["avail"] or ""
         # 'loc' is not a column; rebuild it so PLZ/commute detection still works
         rec["loc"] = f"{r['plz'] or ''} {r['area'] or ''}".strip()
         score, verdict, reasons = match.evaluate(rec)
@@ -30,6 +31,12 @@ def main():
             reasons = [f"scam risk {risk}: " + "; ".join(flags)]
         elif flags:
             reasons.append("caution -- " + "; ".join(flags))
+
+        # Rows stored before avail/warm were kept lack facts the original verdict
+        # used (a "frei bis" date, the warm rent, the full description), so they
+        # would wrongly pass. They may be demoted, never revived.
+        if legacy and r["verdict"] == "REJECT" and verdict != "REJECT":
+            continue
 
         # A listing that vanished from the portal stays gone, whatever it scores now.
         if r["verdict"] == "GONE" and verdict != "REJECT":
