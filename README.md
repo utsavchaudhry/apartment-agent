@@ -47,7 +47,8 @@ docker compose up -d
 Update to the latest version:
 
 ```bash
-git pull && docker compose up -d --build
+git pull
+docker compose up -d --build
 ```
 
 Logs:
