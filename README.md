@@ -37,10 +37,9 @@ Open the dashboard at **http://localhost:8080** (or `http://<machine-ip>:8080` f
 
 ## Optional
 
-Password-protect the dashboard:
+Password-protect the dashboard: create a file named `.env` in the `apartment-agent` folder containing the line `DASHBOARD_PASSWORD=choose-something`, then:
 
 ```bash
-echo "DASHBOARD_PASSWORD=choose-something" > .env
 docker compose up -d
 ```
 
