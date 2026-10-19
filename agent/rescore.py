@@ -44,12 +44,13 @@ def main():
         if r["verdict"] == "GONE" and verdict != "REJECT":
             verdict = "GONE"
 
-        if score != r["score"] or verdict != r["verdict"]:
+        if score != r["score"] or verdict != r["verdict"] or risk != (r["scam_risk"] or 0):
             changed += 1
             newly_good = verdict in ("HIT", "MAYBE") and r["verdict"] == "REJECT"
-            c.execute("UPDATE listings SET score=?, verdict=?, reasons=?"
+            # Keep scam_risk/scam_flags in step too: the dashboard warns from them.
+            c.execute("UPDATE listings SET score=?, verdict=?, reasons=?, scam_risk=?, scam_flags=?"
                       + (", reported=0" if newly_good else "") + " WHERE uid=?",
-                      (score, verdict, " ; ".join(reasons), r["uid"]))
+                      (score, verdict, " ; ".join(reasons), risk, "; ".join(flags), r["uid"]))
     c.commit()
     counts = {row["verdict"]: row["n"] for row in
               c.execute("SELECT verdict, COUNT(*) n FROM listings GROUP BY verdict")}
