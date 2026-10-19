@@ -31,6 +31,8 @@ def main():
             reasons = [f"scam risk {risk}: " + "; ".join(flags)]
         elif flags:
             reasons.append("caution -- " + "; ".join(flags))
+            if scam.verdict(risk) == "SUSPECT" and verdict == "HIT":
+                verdict = "MAYBE"       # dashboard only, never pushed
 
         # Rows stored before avail/warm were kept lack facts the original verdict
         # used (a "frei bis" date, the warm rent, the full description), so they

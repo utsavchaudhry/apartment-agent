@@ -88,6 +88,16 @@ def is_wanted_ad(headline):
     return bool(_SEEKING.search(headline))
 
 
+# "für zwei Wochen", "nur für 3 Monate" -- a sublet, not a home. The Glockenbach
+# ad of 19.10.2026 ("für zwei Wochen vom 18.11.-02.12. unter") said neither
+# "Zwischenmiete" nor "Untermiete" and scored a HIT. Months only count with
+# "nur", so "Kaution für drei Monate" does not trip it.
+_NUM = r"(?:\d+|ein|eine|einen|zwei|drei|vier|fuenf|sechs|sieben|acht|zehn|paar)"
+_SHORT_LET = re.compile(
+    r"\bfuer\s+(?:ca\.?\s+)?" + _NUM + r"\s+(?:tag|tage|nacht|naechte|woche|wochen)\b"
+    r"|\bnur\s+(?:fuer\s+)?" + _NUM + r"\s+(?:monat|monate)\b")
+
+
 MONTHS = {
     "januar": 1, "jan": 1, "februar": 2, "feb": 2, "maerz": 3, "marz": 3, "mar": 3,
     "april": 4, "apr": 4, "mai": 5, "juni": 6, "jun": 6, "juli": 7, "jul": 7,
@@ -190,6 +200,9 @@ def evaluate(rec):
         return 0, "REJECT", [f"not an offer of a flat -- title says '{term}'"]
     if is_wanted_ad(headline):
         return 0, "REJECT", ["a tenant looking for a flat, not a flat on offer"]
+    short = _SHORT_LET.search(text)
+    if short:
+        return 0, "REJECT", [f"short-term let: '{short.group(0)}'"]
 
     price = rec.get("price")
     sqm_for_est = rec.get("sqm")

@@ -7,7 +7,8 @@ all of them are checkable in the ad text.
 
 Returns (risk 0-100, flags). Anything >= 50 must not be contacted.
 """
-import re
+import re, datetime
+import config
 
 UML = str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"})
 
@@ -70,6 +71,27 @@ ABROAD_EXEMPT = re.compile(
 )
 
 
+_CITY_PLZ = re.compile(r"\b8[01]\d{3}\b")
+
+
+def _in_munich_city(rec):
+    """Munich city postcodes are 80xxx/81xxx; the suburbs are 85xxx."""
+    where = f"{rec.get('plz') or ''} {rec.get('loc') or ''} {rec.get('title') or ''}"
+    # WG-Gesucht is only searched inside Munich city, and its teasers often
+    # carry a district name but no postcode.
+    return bool(_CITY_PLZ.search(where)) or rec.get("source") == "WG-Gesucht"
+
+
+def _parse_date(s):
+    m = re.search(r"(\d{2})\.(\d{2})\.(\d{4})", s)
+    if not m:
+        return None
+    try:
+        return datetime.date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+    except ValueError:
+        return None
+
+
 def assess(rec, text=""):
     """rec is a listing dict; text is the full ad body if it has been fetched."""
     blob = _n(" ".join(str(rec.get(k, "")) for k in ("title", "body", "loc")) + " " + text)
@@ -82,22 +104,51 @@ def assess(rec, text=""):
             risk += pts
             flags.append(why)
 
-    # Price far below market is the lure. Munich warm rent is roughly
-    # 25-35 EUR/m2; under 12 EUR/m2 is not a bargain, it is bait.
+    # Price far below market is the lure. Every scam the agent let through in
+    # October 2026 advertised a furnished 45-92 m2 flat in Munich city for
+    # EUR 485-900 (8.6-14.3 EUR/m2), while every genuine flat he dealt with was
+    # 15+ EUR/m2 even on cold rent, and 19+ on warm. Suburbs (Eching,
+    # Oberschleissheim) are genuinely cheaper, so they get their own floor.
     price, sqm = rec.get("price"), rec.get("sqm")
-    if price and sqm and sqm >= 15:
-        per_sqm = price / sqm
-        if per_sqm < 8:
-            risk += 45
-            flags.append(f"{per_sqm:.0f} EUR/m2 — far below any real Munich rent")
-        elif per_sqm < 12:
+    basis = rec.get("warm") or price
+    if price and not rec.get("warm") and rec.get("source") in getattr(config, "ESTIMATE_WARM_FOR", ()):
+        # ImmoScout reports cold rent; compare on the same all-in footing.
+        basis = price + config.NEBENKOSTEN_BASE + (sqm or 30) * config.NEBENKOSTEN_PER_SQM
+    city = _in_munich_city(rec)
+    if basis and sqm and sqm >= 15:
+        per_sqm = basis / sqm
+        if city:
+            scam_below, suspect_below, where = (config.SCAM_CITY_EUR_M2,
+                                                config.SUSPECT_CITY_EUR_M2, "central Munich")
+        else:
+            scam_below, suspect_below, where = (config.SCAM_SUBURB_EUR_M2,
+                                                config.SUSPECT_SUBURB_EUR_M2, "this area")
+        if per_sqm < scam_below:
+            risk += 50
+            flags.append(f"{per_sqm:.1f} EUR/m2 — far below any real rent in {where}")
+        elif per_sqm < suspect_below:
             risk += 25
-            flags.append(f"{per_sqm:.0f} EUR/m2 — suspiciously cheap")
+            flags.append(f"{per_sqm:.1f} EUR/m2 — suspiciously cheap for {where}")
 
-    # A big flat at a tiny price is the classic bait shape
-    if price and sqm and sqm >= 60 and price <= 700:
-        risk += 30
-        flags.append(f"{sqm:.0f} m2 for {price:.0f} EUR — implausible")
+        # The bait shape: a big central flat for the price of a studio.
+        if city and sqm >= 55 and basis < 1000:
+            risk += 30
+            flags.append(f"{sqm:.0f} m2 in central Munich for {basis:.0f} EUR — implausible")
+        # Furnished commands a premium in Munich; cheap AND furnished is the scam template.
+        if city and per_sqm < 20 and re.search(r"m(oe|ö)bliert", blob):
+            risk += 15
+            flags.append("furnished yet cheap")
+
+    # Scams run on throwaway or hijacked accounts. Read off the ad page.
+    since = _parse_date(rec.get("seller_since") or "")
+    if since:
+        age = (datetime.date.today() - since).days
+        if age < config.NEW_SELLER_DAYS:
+            risk += 40
+            flags.append(f"seller account only {age} days old")
+        elif age < 180:
+            risk += 10
+            flags.append(f"seller account {age} days old")
 
     return min(100, risk), flags
 

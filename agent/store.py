@@ -40,7 +40,8 @@ EXTRA_COLS = {
     # What the matcher read at scan time, kept so a rescore sees the same facts.
     # NULL avail marks a row stored before these existed (see rescore.py).
     "avail": "TEXT",
-    "warm": "REAL",     # '' | contacted | dismissed -- set from the dashboard
+    "warm": "REAL",
+    "seller_since": "TEXT",          # Kleinanzeigen "Aktiv seit" -- scam signal     # '' | contacted | dismissed -- set from the dashboard
 }
 
 

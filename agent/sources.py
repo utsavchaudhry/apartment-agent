@@ -257,6 +257,9 @@ def detail(url):
         out["avail"] = attrs.get("Verfügbar ab", "")
         out["deposit"] = _num(attrs.get("Kaution / Genoss.-Anteile", ""))
         out["warm"] = _num(attrs.get("Warmmiete", ""))
+        sm = re.search(r"Aktiv seit\s*(\d{2}\.\d{2}\.\d{4})", doc)
+        if sm:
+            out["seller_since"] = sm.group(1)
         pm = re.search(r'id="viewad-extra-info".*?(\d{2}\.\d{2}\.\d{4})', doc, re.S)
         if pm:
             out["posted"] = pm.group(1)

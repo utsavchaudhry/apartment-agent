@@ -122,6 +122,14 @@ export default function Settings() {
         <Lines label="Minus 10 points" {...bind("soft_negative")} rows={4} />
       </Section>
 
+      <Section title="Scam filter" hint="Ads far below market rent are the classic bait: a big furnished flat in central Munich for the price of a studio. Below the scam line an ad is rejected; between the scam and suspect lines it stays on the dashboard with a warning but never sends a phone alert. Rent is compared all-in (warm) where the ad states it. Central Munich = postcodes 80xxx/81xxx.">
+        <Num label="Central Munich: scam below (€/m²)" step="any" {...bind("scam_city_eur_m2")} />
+        <Num label="Central Munich: suspect below (€/m²)" step="any" {...bind("suspect_city_eur_m2")} />
+        <Num label="New seller account (days)" hint="Kleinanzeigen accounts younger than this are flagged" {...bind("new_seller_days")} />
+        <Num label="Suburbs: scam below (€/m²)" step="any" {...bind("scam_suburb_eur_m2")} />
+        <Num label="Suburbs: suspect below (€/m²)" step="any" {...bind("suspect_suburb_eur_m2")} />
+      </Section>
+
       <Section title="Sources" hint="Where to search. IDs come from each portal's own search URL.">
         <Check label="Kleinanzeigen" {...bind("sources.kleinanzeigen.enabled")} />
         <Text label="Location slug" {...bind("sources.kleinanzeigen.location_slug")} />

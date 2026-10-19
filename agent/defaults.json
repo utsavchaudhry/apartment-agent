@@ -285,6 +285,11 @@
     "dachgeschoss ohne",
     "souterrain"
   ],
+  "scam_city_eur_m2": 15,
+  "suspect_city_eur_m2": 17,
+  "scam_suburb_eur_m2": 12,
+  "suspect_suburb_eur_m2": 14,
+  "new_seller_days": 30,
   "sources": {
     "kleinanzeigen": {
       "enabled": true,

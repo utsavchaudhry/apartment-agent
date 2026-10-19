@@ -69,6 +69,8 @@ def main():
                     r["avail"] = d.get("avail") or r.get("avail", "")
                     if d.get("warm"):
                         r["warm"] = d["warm"]
+                    if d.get("seller_since"):
+                        r["seller_since"] = d["seller_since"]
                     r["posted"] = posted
                     r["body"] = (r.get("body", "") + " | " + full_text)[:4000]
                     score, verdict, reasons = match.evaluate(r)
@@ -80,6 +82,11 @@ def main():
                 reasons = [f"scam risk {risk}: " + "; ".join(flags)]
             elif flags:
                 reasons.append("caution -- " + "; ".join(flags))
+                # A suspect listing stays on the dashboard but never reaches
+                # the phone: every scam that got through in October 2026 was
+                # a HIT with a 0-25 risk score and was pushed as a match.
+                if scam.verdict(risk) == "SUSPECT" and verdict == "HIT":
+                    verdict = "MAYBE"
 
             rec = dict(
                 uid=r["uid"], source=r["source"], url=r.get("url", ""),
@@ -89,6 +96,7 @@ def main():
                 score=score, verdict=verdict, reasons=" ; ".join(reasons),
                 body=(r.get("body") or "")[:4000],
                 avail=r.get("avail") or "", warm=r.get("warm"),
+                seller_since=r.get("seller_since") or "",
                 posted=posted, scam_risk=risk, scam_flags="; ".join(flags),
                 checked=checked,
             )
