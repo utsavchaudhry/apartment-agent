@@ -40,7 +40,7 @@ def _term_re(term):
 # the title names no dwelling at all.
 _AMENITY_TERMS = {"stellplatz", "garage", "lager", "buero"}
 _DWELLING = re.compile(
-    r"\b(?:wohnung|whg|apartment|appartement|maisonette|penthouse|studio"
+    r"\b(?:wohnung|whg|apartment|appartement|maisonette|penthouse"
     r"|\w*wohnung|\d+(?:[,.]5)?[- ]?(?:zimmer|zi)\b)")
 
 

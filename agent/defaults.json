@@ -285,7 +285,9 @@
     "tage",
     "uebernachtung",
     "übernachtung",
-    "messe"
+    "messe",
+    "hobbyraum",
+    "atelier"
   ],
   "soft_negative": [
     "ohne kueche",
