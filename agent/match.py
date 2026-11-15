@@ -36,6 +36,14 @@ def _term_re(term):
     return re.compile(pat)
 
 
+# Title terms that a flat can come *with*. They only mark a non-flat ad when
+# the title names no dwelling at all.
+_AMENITY_TERMS = {"stellplatz", "garage", "lager", "buero"}
+_DWELLING = re.compile(
+    r"\b(?:wohnung|whg|apartment|appartement|maisonette|penthouse|studio"
+    r"|\w*wohnung|\d+(?:[,.]5)?[- ]?(?:zimmer|zi)\b)")
+
+
 def blocked_by(terms, text):
     """-> the first term that matches, or None."""
     for term in terms:
@@ -125,15 +133,22 @@ def parse_dates(text):
             out.append(datetime.date(y, mo, d))
         except ValueError:
             pass
+    named = []          # spans of "1. Januar 2027"-style dates
     for m in re.finditer(r"\b(\d{1,2})\.?\s*([a-z]{3,9})\.?\s*(\d{4})\b", t):
         d, mon, y = m.group(1), m.group(2), m.group(3)
         if mon in MONTHS:
             try:
                 out.append(datetime.date(int(y), MONTHS[mon], int(d)))
+                named.append(m.span())
             except ValueError:
                 pass
     for m in re.finditer(r"\b([a-z]{3,9})\s+(\d{4})\b", t):
         mon, y = m.group(1), m.group(2)
+        # "Januar 2027" inside "1. Januar 2027" is the same date, not a second
+        # one: counting it twice made "ab 1. Januar 2027" (49116562) a "fixed
+        # term 2027-01-01 to 2027-01-01", and "15. Januar" would end before it began.
+        if any(a <= m.start() < b for a, b in named):
+            continue
         if mon in MONTHS:
             try:
                 out.append(datetime.date(int(y), MONTHS[mon], 1))
@@ -195,7 +210,13 @@ def evaluate(rec):
     term = blocked_by(config.BLOCK_TERMS, text)
     if term:
         return 0, "REJECT", [f"blocked term: '{term}'"]
-    term = blocked_by(getattr(config, "BLOCK_TERMS_TITLE", ()), headline)
+    title_terms = getattr(config, "BLOCK_TERMS_TITLE", ())
+    if _DWELLING.search(headline):
+        # "Helle Wohnung mit Balkon u. TG-Stellplatz" offers a flat that comes
+        # with parking; only a title with no flat in it is a parking/storage ad.
+        # 137214049 ("Zum 1.2/15.1.27, an 1 Person") was dropped this way.
+        title_terms = [x for x in title_terms if norm(x) not in _AMENITY_TERMS]
+    term = blocked_by(title_terms, headline)
     if term:
         return 0, "REJECT", [f"not an offer of a flat -- title says '{term}'"]
     if is_wanted_ad(headline):
