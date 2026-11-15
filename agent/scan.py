@@ -69,6 +69,8 @@ def main():
                     r["avail"] = d.get("avail") or r.get("avail", "")
                     if d.get("warm"):
                         r["warm"] = d["warm"]
+                    elif d.get("extra_costs") and r.get("price"):
+                        r["warm"] = float(r["price"]) + d["extra_costs"]
                     if d.get("seller_since"):
                         r["seller_since"] = d["seller_since"]
                     r["posted"] = posted
@@ -95,7 +97,7 @@ def main():
                 commute=commute, move_in=str(mdate) if mdate else "",
                 score=score, verdict=verdict, reasons=" ; ".join(reasons),
                 body=(r.get("body") or "")[:4000],
-                avail=r.get("avail") or "", warm=r.get("warm"),
+                avail=r.get("avail") or "", warm=r.get("warm"), warm_cap=r.get("warm_cap"),
                 seller_since=r.get("seller_since") or "",
                 posted=posted, scam_risk=risk, scam_flags="; ".join(flags),
                 checked=checked,

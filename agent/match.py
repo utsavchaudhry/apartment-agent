@@ -207,6 +207,7 @@ def evaluate(rec):
     price = rec.get("price")
     sqm_for_est = rec.get("sqm")
     est_warm = None
+    capped = False
     # A warm rent read off the ad page beats any estimate. Both Kleinanzeigen
     # and ImmoScout report one once the detail page has been fetched.
     real_warm = rec.get("warm")
@@ -220,6 +221,12 @@ def evaluate(rec):
         extra = (getattr(config, "NEBENKOSTEN_BASE", 100.0)
                  + (sqm_for_est or 30) * getattr(config, "NEBENKOSTEN_PER_SQM", 4.0))
         est_warm = price + extra
+        # The portal already filtered on its own all-in rent (see sources.py);
+        # never estimate above what it guarantees. The ad page fetched next
+        # replaces this with the real Gesamtmiete.
+        cap = rec.get("warm_cap")
+        if cap and est_warm > float(cap):
+            est_warm, capped = float(cap), True
 
     # A placeholder price ("1 EUR VB") is an absence of information, not a
     # bargain; treating it as one handed a 50 m2 attic room a 75 score.
@@ -311,7 +318,8 @@ def evaluate(rec):
     # ---- score -------------------------------------------------------
     score = 50
     if est_warm is not None and price is not None:
-        how = "laut Anzeige" if real_warm else "estimated"
+        how = ("laut Anzeige" if real_warm else
+               "at most, per the portal's total-rent filter" if capped else "estimated")
         reasons.append(f"{price:.0f} EUR kalt -> {est_warm:.0f} EUR warm ({how})")
     if check_price is not None:
         price = check_price

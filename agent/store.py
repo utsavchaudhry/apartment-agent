@@ -41,7 +41,8 @@ EXTRA_COLS = {
     # NULL avail marks a row stored before these existed (see rescore.py).
     "avail": "TEXT",
     "warm": "REAL",
-    "seller_since": "TEXT",          # Kleinanzeigen "Aktiv seit" -- scam signal     # '' | contacted | dismissed -- set from the dashboard
+    "seller_since": "TEXT",          # Kleinanzeigen "Aktiv seit" -- scam signal
+    "warm_cap": "REAL",              # all-in rent ceiling the portal's own search applied
 }
 
 

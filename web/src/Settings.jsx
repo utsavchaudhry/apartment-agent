@@ -141,6 +141,8 @@ export default function Settings() {
         <Num label="City id" {...bind("sources.wggesucht.city_id")} />
         <hr className="full" />
         <Check label="ImmoScout24" {...bind("sources.immoscout24.enabled")} />
+        <Text label="Radius search" hint="lat;lon;km around the office, newest first. Empty = regions only" {...bind("sources.immoscout24.radius")} />
+        <Num label="Radius pages" hint="20 ads per page" {...bind("sources.immoscout24.radius_pages")} />
         <Lines label="Regions (one path per line)" {...bind("sources.immoscout24.regions")} rows={5} />
       </Section>
 

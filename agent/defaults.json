@@ -160,6 +160,14 @@
     "81929": [
       "Bogenhausen (154+50+U6, 2x um)",
       45
+    ],
+    "80993": [
+      "Moosach/OEZ (U3+U6, 1x um)",
+      46
+    ],
+    "80995": [
+      "Feldmoching (S1+292 or U2+294, 1x um)",
+      47
     ]
   },
   "station_commute": {
@@ -313,7 +321,9 @@
         "/de/bayern/muenchen/milbertshofen",
         "/de/bayern/muenchen-kreis/unterschleissheim"
       ],
-      "per_region": 50
+      "per_region": 50,
+      "radius": "48.2468;11.629;10",
+      "radius_pages": 3
     }
   },
   "schedule": {

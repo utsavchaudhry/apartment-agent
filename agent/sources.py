@@ -257,6 +257,15 @@ def detail(url):
         out["avail"] = attrs.get("Verfügbar ab", "")
         out["deposit"] = _num(attrs.get("Kaution / Genoss.-Anteile", ""))
         out["warm"] = _num(attrs.get("Warmmiete", ""))
+        # Many ads fill Nebenkosten (and Heizkosten) but leave Warmmiete empty.
+        # Without this the cold rent alone was checked against the ceiling: a
+        # 1,250 kalt + 340 NK Maisonette (3571064728) passed as "1250 EUR".
+        # scan.py adds this to the teaser's Kaltmiete. "in Nebenkosten
+        # enthalten" parses to None and so is not counted twice.
+        extra = sum(v for v in (_num(attrs.get("Nebenkosten", "")),
+                                _num(attrs.get("Heizkosten", ""))) if v)
+        if extra:
+            out["extra_costs"] = extra
         sm = re.search(r"Aktiv seit\s*(\d{2}\.\d{2}\.\d{4})", doc)
         if sm:
             out["seller_since"] = sm.group(1)
@@ -316,8 +325,63 @@ def _rel_date(s):
     return str(today - datetime.timedelta(days=n * days))
 
 
+def _is24_row(lst, max_price):
+    addr = lst.address
+    line = getattr(addr, "line", "") or ""
+    return dict(
+        uid=f"is24:{lst.id}",
+        source="ImmoScout24",
+        url=lst.url or f"https://www.immobilienscout24.de/expose/{lst.id}",
+        title=lst.title or "",
+        price=lst.price,             # Kaltmiete: the teaser shows only that
+        sqm=lst.living_space,
+        rooms=lst.rooms,
+        loc=line,
+        avail="",
+        posted=_rel_date(lst.published or ""),
+        # Every search here filters with pricetype=calculatedtotalrent, so
+        # ImmoScout's own all-in rent for this ad is at most max_price. The
+        # matcher's kalt+Nebenkosten guess must not exceed that: it rejected
+        # 172546363 (980 kalt, real 1,290 warm) as "1,312 est." on 12.11.2026.
+        warm_cap=float(max_price),
+        body=" | ".join(x for x in (lst.title or "", line,
+                                    "privater Anbieter" if lst.is_private else "") if x),
+    )
+
+
+def _is24_radius(client, radius, pages, max_price):
+    """Newest-first radius search, the same query as the saved search on the site.
+
+    The district list misses whole towns inside the commute band (Oberschleissheim,
+    Eching, Ismaning: 21-28 min); a radius around the office does not. The
+    library's SearchFilter always sends a region geocode, which the API rejects
+    alongside searchType=radius (HTTP 412), hence the raw request.
+    """
+    from immoscout.models import SearchResult
+    params = {
+        "searchType": "radius",
+        "geocoordinates": radius,              # "lat;lon;km"
+        "realestatetype": "apartmentrent",
+        "pricetype": "calculatedtotalrent",
+        "price": f"-{float(max_price)}",
+        "sorting": "-firstactivation",         # newest first; older ones are already stored
+    }
+    found = []
+    for page in range(1, int(pages) + 1):
+        params["pagenumber"] = page
+        data = client._request("POST", "search/list", params=params,
+                               json={"supportedResultListType": [], "userData": {}})
+        res = SearchResult.from_api(data)
+        found.extend(res.listings)
+        if not res.listings or page >= res.number_of_pages:
+            break
+        time.sleep(random.uniform(2.0, 4.0))
+    return found
+
+
 def immoscout24(max_price=1300):
-    """Query only the configured regions (settings: sources.immoscout24.regions)."""
+    """A radius around the office (sources.immoscout24.radius) plus the
+    configured regions (sources.immoscout24.regions)."""
     o = config.SOURCES["immoscout24"]
     per_region = int(o.get("per_region", 50))
     try:
@@ -331,6 +395,14 @@ def immoscout24(max_price=1300):
         return []
 
     out = []
+    if o.get("radius"):
+        try:
+            for lst in _is24_radius(client, o["radius"], o.get("radius_pages", 3), max_price):
+                out.append(_is24_row(lst, max_price))
+        except Exception:
+            pass           # the region queries below still run
+        time.sleep(random.uniform(2.0, 4.0))
+
     for region in o.get("regions", []):
         try:
             flt = SearchFilter(region=region, real_estate_type="apartmentrent",
@@ -340,22 +412,7 @@ def immoscout24(max_price=1300):
             continue
 
         for lst in listings:
-            addr = lst.address
-            line = getattr(addr, "line", "") or ""
-            out.append(dict(
-                uid=f"is24:{lst.id}",
-                source="ImmoScout24",
-                url=lst.url or f"https://www.immobilienscout24.de/expose/{lst.id}",
-                title=lst.title or "",
-                price=lst.price,
-                sqm=lst.living_space,
-                rooms=lst.rooms,
-                loc=line,
-                avail="",
-                posted=_rel_date(lst.published or ""),
-                body=" | ".join(x for x in (lst.title or "", line,
-                                            "privater Anbieter" if lst.is_private else "") if x),
-            ))
+            out.append(_is24_row(lst, max_price))
         time.sleep(random.uniform(2.0, 4.0))
 
     seen, uniq = set(), []
