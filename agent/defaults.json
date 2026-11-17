@@ -93,6 +93,10 @@
       "Milbertshofen-Am Hart (U3+U6, 1x um)",
       38
     ],
+    "85774": [
+      "Unterföhring (X202)",
+      38
+    ],
     "80333": [
       "Maxvorstadt (58+U6, 1x um)",
       39
@@ -109,6 +113,10 @@
       "Moosinning (513+X202, 1x um)",
       40
     ],
+    "80935": [
+      "Milbertshofen-Am Hart (294 or U2+U3+U6)",
+      40
+    ],
     "81679": [
       "Bogenhausen (68+U6, 1x um)",
       41
@@ -123,6 +131,10 @@
     ],
     "80636": [
       "Neuhausen-Nymphenburg (U1+U6, 1x um)",
+      42
+    ],
+    "81927": [
+      "Bogenhausen-Englschalking (X202)",
       42
     ],
     "80933": [
@@ -163,6 +175,10 @@
     ],
     "80993": [
       "Moosach/OEZ (U3+U6, 1x um)",
+      46
+    ],
+    "85375": [
+      "Neufahrn (S1+X202 or 690+U6, 1x um)",
       46
     ],
     "80995": [
@@ -240,7 +256,6 @@
     "wg ab",
     "zimmer in einer",
     "mitbewohner gesucht",
-    "zimmer frei",
     "wochenendheimfahrer",
     "wochenend-heimfahrer",
     "zweitwohnsitz",
@@ -291,7 +306,16 @@
     "übernachtung",
     "messe",
     "hobbyraum",
-    "atelier"
+    "atelier",
+    "zimmer frei",
+    "sucht wohnung",
+    "sucht eine",
+    "sucht ein",
+    "sucht 1",
+    "sucht 2",
+    "teilen",
+    "pendlerwohnung",
+    "hobby raum"
   ],
   "soft_negative": [
     "ohne kueche",

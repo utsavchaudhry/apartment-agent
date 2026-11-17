@@ -44,11 +44,20 @@ _DWELLING = re.compile(
     r"|\w*wohnung|\d+(?:[,.]5)?[- ]?(?:zimmer|zi)\b)")
 
 
+# Words right before a block term that turn it into the opposite claim:
+# "nicht WG-geeignet", "keine Zwischenmiete", "kein WG-Zimmer", or a mere
+# suitability note ("eignet sich auch fuer eine Studenten-WG"). All four were
+# rejecting ordinary open-ended flats in November 2026.
+_NEGATED = re.compile(r"(?:\b(?:nicht|kein|keine|keinen|keinesfalls|ohne)"
+                      r"|\bauch\s+(?:fuer|als)(?:\s+(?:eine?n?|einzelne))?)\s*$")
+
+
 def blocked_by(terms, text):
-    """-> the first term that matches, or None."""
+    """-> the first term that matches outside a negation, or None."""
     for term in terms:
-        if _term_re(term).search(text):
-            return term
+        for m in _term_re(term).finditer(text):
+            if not _NEGATED.search(text[max(0, m.start() - 30):m.start()]):
+                return term
     return None
 
 
@@ -255,6 +264,19 @@ def evaluate(rec):
         price = est_warm = None
 
     check_price = est_warm if est_warm is not None else price
+    # The estimate is deliberately high (small furnished flats), so a flat whose
+    # real Nebenkosten are ordinary can land just over the ceiling on paper --
+    # and a teaser REJECT means its ad page, with the real Gesamtmiete, is never
+    # read. 172542962 (Garching, 56 m2, 1,000 kalt) died this way at "1,324".
+    # If a low-but-real utilities figure would fit, keep it as a MAYBE.
+    unverified_over = False
+    if (price is not None and est_warm is not None and not real_warm and not capped
+            and check_price > config.MAX_RENT_WARM
+            and price + 50 + 2.5 * (sqm_for_est or 30) <= config.MAX_RENT_WARM):
+        unverified_over = True
+        reasons.append(f"estimated {est_warm:.0f} EUR warm is over the {config.MAX_RENT_WARM} "
+                       f"ceiling, but the ad gives no real figure -- check the Gesamtmiete")
+        check_price = config.MAX_RENT_WARM
     if price is None:
         reasons.append("no real price given -- ad says VB / nach Absprache")
     elif check_price > config.MAX_RENT_WARM:
@@ -330,11 +352,16 @@ def evaluate(rec):
         return 0, "REJECT", [f"stale: advertised free from {mdate}, already past"]
 
     # Same for the posting date, when we have fetched the ad page.
+    # An old posting date alone is not proof the flat is gone: the scan only
+    # sees ads the portal still lists, and ImmoScout keeps re-dated or slow ads
+    # (one read as "posted 2024-11-10"). Flag it and keep it off the phone.
     posted = rec.get("posted")
+    old_post = False
     if posted:
         pd = parse_dates(posted)
         if pd and (today - pd[0]).days > getattr(config, "STALE_AFTER_DAYS", 21):
-            return 0, "REJECT", [f"stale: posted {pd[0]}, {(today - pd[0]).days} days ago"]
+            old_post = True
+            reasons.append(f"posted {pd[0]}, {(today - pd[0]).days} days ago -- may be taken")
 
     # ---- score -------------------------------------------------------
     score = 50
@@ -387,5 +414,6 @@ def evaluate(rec):
     # Never promote an ad to HIT while the rent is unknown -- HITs get pushed to
     # your phone the moment they are found, and "price on request" is not news.
     priced = check_price is not None
-    verdict = "HIT" if (score >= 70 and priced and mstatus in ("ok", "unknown")) else "MAYBE"
+    verdict = "HIT" if (score >= 70 and priced and mstatus in ("ok", "unknown")
+                        and not unverified_over and not old_post) else "MAYBE"
     return score, verdict, reasons
