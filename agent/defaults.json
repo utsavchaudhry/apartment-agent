@@ -113,10 +113,6 @@
       "Moosinning (513+X202, 1x um)",
       40
     ],
-    "80935": [
-      "Milbertshofen-Am Hart (294 or U2+U3+U6)",
-      40
-    ],
     "81679": [
       "Bogenhausen (68+U6, 1x um)",
       41
@@ -131,10 +127,6 @@
     ],
     "80636": [
       "Neuhausen-Nymphenburg (U1+U6, 1x um)",
-      42
-    ],
-    "81927": [
-      "Bogenhausen-Englschalking (X202)",
       42
     ],
     "80933": [
@@ -173,6 +165,10 @@
       "Bogenhausen (154+50+U6, 2x um)",
       45
     ],
+    "81927": [
+      "Bogenhausen-Englschalking (154+U6 or X202)",
+      46
+    ],
     "80993": [
       "Moosach/OEZ (U3+U6, 1x um)",
       46
@@ -184,6 +180,10 @@
     "80995": [
       "Feldmoching (S1+292 or U2+294, 1x um)",
       47
+    ],
+    "80935": [
+      "Lerchenau/Harthof (173+U3+U6, 1x um)",
+      48
     ]
   },
   "station_commute": {
