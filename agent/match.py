@@ -120,7 +120,31 @@ MONTHS = {
     "april": 4, "apr": 4, "mai": 5, "juni": 6, "jun": 6, "juli": 7, "jul": 7,
     "august": 8, "aug": 8, "september": 9, "sep": 9, "sept": 9, "oktober": 10,
     "okt": 10, "november": 11, "nov": 11, "dezember": 12, "dez": 12,
+    # English, as Munich ads mix languages ("von Februar 2027 bis Ende July 2027")
+    "january": 1, "february": 2, "march": 3, "may": 5, "june": 6, "july": 7,
+    "october": 10, "oct": 10, "december": 12, "dec": 12,
 }
+
+# "von Februar 2027 bis Ende Juli 2027", "vom 01.02.2027 bis 31.07.2027": a
+# fixed-term let stated in the body. KA 3575024001 (student residence, Feb to
+# July 2027) scored a HIT because only the "avail" field was checked for spans.
+_MON_RE = "(?:" + "|".join(sorted(MONTHS, key=len, reverse=True)) + r")\.?"
+_FIXED_SPAN = re.compile(
+    r"\bvon?m?\s+(?:anfang\s+|mitte\s+)?((?:\d{1,2}\.\s*)?" + _MON_RE + r"\s+\d{4}"
+    r"|\d{1,2}\.\s*\d{1,2}\.\s*\d{2,4})"
+    r"\s*(?:bis|-|–)\s*(?:ende\s+|mitte\s+|zum\s+)?((?:\d{1,2}\.\s*)?" + _MON_RE + r"\s+\d{4}"
+    r"|\d{1,2}\.\s*\d{1,2}\.\s*\d{2,4})")
+
+
+def fixed_span(text):
+    """(start, end) if the text lets the flat for a bounded period, else None.
+    Spans under four weeks are viewing windows ("Besichtigung vom 10. bis
+    12.12."), not leases, and are ignored."""
+    for m in _FIXED_SPAN.finditer(text):
+        a, b = parse_dates(m.group(1)), parse_dates(m.group(2))
+        if a and b and 28 <= (b[-1] - a[0]).days <= 1100:
+            return a[0], b[-1]
+    return None
 
 
 def parse_dates(text):
@@ -230,6 +254,9 @@ def evaluate(rec):
         return 0, "REJECT", [f"not an offer of a flat -- title says '{term}'"]
     if is_wanted_ad(headline):
         return 0, "REJECT", ["a tenant looking for a flat, not a flat on offer"]
+    span = fixed_span(text)
+    if span:
+        return 0, "REJECT", [f"not open-ended: let from {span[0]} to {span[1]}"]
     short = _SHORT_LET.search(text)
     if short:
         return 0, "REJECT", [f"short-term let: '{short.group(0)}'"]
